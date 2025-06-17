@@ -3,3 +3,5 @@
 # Ask Doubt on telegram @KingVJ01
 
 web: python3 bot.py
+search: python3 search_bot.py
+file:   python3 file_bot.py
