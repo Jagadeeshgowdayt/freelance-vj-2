@@ -1,27 +1,26 @@
-# file_bot.py
 import os
 from pyrogram import Client, filters
-from pyrogram.types import Message
 
-FILE_TOKEN  = os.getenv("FILE_BOT_TOKEN")
-API_ID      = int(os.getenv("API_ID"))
-API_HASH    = os.getenv("API_HASH")
+API_ID = int(os.getenv("API_ID"))
+API_HASH = os.getenv("API_HASH")
+BOT_TOKEN = os.getenv("FILE_BOT_TOKEN")
 FILE_CHANNEL = os.getenv("FILE_CHANNEL")
 
-app = Client("file_bot", api_id=API_ID, api_hash=API_HASH, bot_token=FILE_TOKEN)
+app = Client("file_bot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 
 @app.on_message(filters.command("start") & filters.private)
-async def start_handler(client, message: Message):
+async def start(client, message):
     if len(message.command) == 1:
-        return await message.reply_text("Send me a movie name or use the button from the Search Bot.")
-    
-    file_id = message.command[1]
-    # 1) Validate the payload
-    # 2) Retrieve the actual file: file_id could be a media file_id or a database key
-    await client.send_cached_media(
-        chat_id=message.chat.id,
-        file_id=file_id  # if you stored Telegram’s file_id
-    )
+        return await message.reply("Send movie name or use Search Bot.")
 
-if __name__ == "__main__":
-    app.run()
+    file_id = message.command[1]
+    try:
+        await client.copy_message(
+            chat_id=message.chat.id,
+            from_chat_id=int(FILE_CHANNEL),
+            message_id=int(file_id)
+        )
+    except Exception as e:
+        await message.reply(f"Error: {e}")
+
+app.run()
